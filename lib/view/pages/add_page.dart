@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:student_app_getx/controller/mycontroll.dart';
 import 'package:student_app_getx/model/student_model.dart';
+import 'package:student_app_getx/view/widget/notification.dart';
 
 class AddPage extends StatelessWidget {
   AddPage({super.key});
@@ -13,6 +14,10 @@ class AddPage extends StatelessWidget {
   final TextEditingController _place = TextEditingController();
   final TextEditingController _std = TextEditingController();
   final _formkey = GlobalKey<FormState>();
+  final _nameKey = GlobalKey<FormFieldState>();
+  final _ageKey = GlobalKey<FormFieldState>();
+  final _placeKey = GlobalKey<FormFieldState>();
+  final _stdKey = GlobalKey<FormFieldState>();
 
   final mycontroller = Get.find<MyController>();
   
@@ -20,7 +25,9 @@ class AddPage extends StatelessWidget {
   Widget build(BuildContext context) {
     mycontroller.imagePick.value = '';
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: const Text('Add deatails'),
+      ),
       body: Form(
         key: _formkey,
         child: Padding(
@@ -36,6 +43,17 @@ class AddPage extends StatelessWidget {
               ),
               TextFormField(
                 controller: _name,
+                key: _nameKey,
+                validator: (value) {
+                  if ((!RegExp(r'^\S+(?!\d+$)').hasMatch(value!))) {
+                    return 'enter valid catogory';
+                  } else {
+                    return null;
+                  }
+                },
+                onChanged: (value) {
+                  _nameKey.currentState!.validate();
+                },
                 decoration: InputDecoration(
                     hintText: 'Name',
                     border: OutlineInputBorder(
@@ -53,6 +71,17 @@ class AddPage extends StatelessWidget {
                     fontWeight: FontWeight.bold),
               ),
               TextFormField(
+                 key: _ageKey,
+                validator: (value) {
+                  if ((!RegExp(r'^[0-9]+\.?[0-9]*$').hasMatch(value!))) {
+                    return 'enter valid amount';
+                  } else {
+                    return null;
+                  }
+                },
+                onChanged: (value) {
+                  _ageKey.currentState!.validate();
+                },
                 controller: _age,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
@@ -73,6 +102,17 @@ class AddPage extends StatelessWidget {
               ),
               TextFormField(
                 controller: _place,
+                key: _placeKey,
+                validator: (value) {
+                  if ((!RegExp(r'^\S+(?!\d+$)').hasMatch(value!))) {
+                    return 'enter valid catogory';
+                  } else {
+                    return null;
+                  }
+                },
+                onChanged: (value) {
+                  _placeKey.currentState!.validate();
+                },
                 decoration: InputDecoration(
                     hintText: 'Place',
                     border: OutlineInputBorder(
@@ -90,6 +130,17 @@ class AddPage extends StatelessWidget {
                     fontWeight: FontWeight.bold),
               ),
               TextFormField(
+                 key: _stdKey,
+                validator: (value) {
+                  if ((!RegExp(r'^[0-9]+\.?[0-9]*$').hasMatch(value!))) {
+                    return 'enter valid amount';
+                  } else {
+                    return null;
+                  }
+                },
+                onChanged: (value) {
+                  _stdKey.currentState!.validate();
+                },
                 controller: _std,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
@@ -133,7 +184,14 @@ class AddPage extends StatelessWidget {
                   style:
                       ElevatedButton.styleFrom(backgroundColor: Colors.green),
                   onPressed: () {
-                    StudentModel val = StudentModel(
+
+                    if (mycontroller.imagePick.value == '') {
+                        errorSnackBar(context, 'pls add image');
+                        _formkey.currentState!.validate();
+                        return;
+                      }
+                    if(_formkey.currentState!.validate()){
+                       StudentModel val = StudentModel(
                       id: DateTime.now().millisecondsSinceEpoch.toString(),
                       name: _name.text,
                       age: int.parse(_age.text),
@@ -142,7 +200,15 @@ class AddPage extends StatelessWidget {
                       image: mycontroller.imagePick.value,
                     );
                     mycontroller.addData(val);
-                    Get.back();
+                     mycontroller.imagePick.value='';
+                        _name.text='';
+                        _age.text='';
+                        _place.text='';
+                        _std.text='';
+                        successSnackBar(context, 'Data added successfully');
+                    }
+
+                   
                   },
                   child: const Text('select image')),
             ],

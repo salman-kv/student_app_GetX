@@ -11,7 +11,9 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(),
+        appBar: AppBar(
+          title:const Text('Student deatails GetX'),
+        ),
         body: Column(
           children: [
            searhBox(),
@@ -19,7 +21,7 @@ class HomePage extends StatelessWidget {
               child: GetX<MyController>(
                 init: Get.find<MyController>(),
                 builder: (controller) {
-                  return GridView.count(
+                  return controller.studentDetails.isEmpty ? const Center(child: Text('No Data Found'),) : GridView.count(
                     physics: const ScrollPhysics(),
                     crossAxisCount: 2,
                     children: List.generate(
@@ -34,10 +36,11 @@ class HomePage extends StatelessWidget {
           ],
         ),
         floatingActionButton: FloatingActionButton(
+          backgroundColor: Colors.amber,
           onPressed: () {
             Get.to(AddPage());
           },
-          child:const Text('add'),
+          child:const Icon(Icons.add),
         ),
       ),
     );

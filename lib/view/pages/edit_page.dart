@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:student_app_getx/controller/mycontroll.dart';
 import 'package:student_app_getx/model/student_model.dart';
+import 'package:student_app_getx/view/widget/notification.dart';
 
 class EditPage extends StatelessWidget {
   final StudentModel data;
@@ -13,7 +14,10 @@ class EditPage extends StatelessWidget {
   final TextEditingController _age = TextEditingController();
   final TextEditingController _place = TextEditingController();
   final TextEditingController _std = TextEditingController();
-
+  final _nameKey = GlobalKey<FormFieldState>();
+  final _ageKey = GlobalKey<FormFieldState>();
+  final _placeKey = GlobalKey<FormFieldState>();
+  final _stdKey = GlobalKey<FormFieldState>();
   final _formkey = GlobalKey<FormState>();
 
   @override
@@ -25,7 +29,12 @@ class EditPage extends StatelessWidget {
     _place.text = data.place;
     _std.text = data.std.toString();
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: const Text(
+          'Edit student deatails',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+      ),
       body: Form(
         key: _formkey,
         child: Padding(
@@ -40,6 +49,17 @@ class EditPage extends StatelessWidget {
                     fontWeight: FontWeight.bold),
               ),
               TextFormField(
+                key: _nameKey,
+                validator: (value) {
+                  if ((!RegExp(r'^\S+(?!\d+$)').hasMatch(value!))) {
+                    return 'enter valid catogory';
+                  } else {
+                    return null;
+                  }
+                },
+                onChanged: (value) {
+                  _nameKey.currentState!.validate();
+                },
                 controller: _name,
                 decoration: InputDecoration(
                     hintText: 'Name',
@@ -58,6 +78,17 @@ class EditPage extends StatelessWidget {
                     fontWeight: FontWeight.bold),
               ),
               TextFormField(
+                key: _ageKey,
+                validator: (value) {
+                  if ((!RegExp(r'^[0-9]+\.?[0-9]*$').hasMatch(value!))) {
+                    return 'enter valid amount';
+                  } else {
+                    return null;
+                  }
+                },
+                onChanged: (value) {
+                  _ageKey.currentState!.validate();
+                },
                 controller: _age,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
@@ -77,6 +108,17 @@ class EditPage extends StatelessWidget {
                     fontWeight: FontWeight.bold),
               ),
               TextFormField(
+                key: _placeKey,
+                validator: (value) {
+                  if ((!RegExp(r'^\S+(?!\d+$)').hasMatch(value!))) {
+                    return 'enter valid catogory';
+                  } else {
+                    return null;
+                  }
+                },
+                onChanged: (value) {
+                  _placeKey.currentState!.validate();
+                },
                 controller: _place,
                 decoration: InputDecoration(
                     hintText: 'Place',
@@ -95,6 +137,17 @@ class EditPage extends StatelessWidget {
                     fontWeight: FontWeight.bold),
               ),
               TextFormField(
+                key: _stdKey,
+                validator: (value) {
+                  if ((!RegExp(r'^[0-9]+\.?[0-9]*$').hasMatch(value!))) {
+                    return 'enter valid amount';
+                  } else {
+                    return null;
+                  }
+                },
+                onChanged: (value) {
+                  _stdKey.currentState!.validate();
+                },
                 controller: _std,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
@@ -106,15 +159,16 @@ class EditPage extends StatelessWidget {
               const SizedBox(
                 height: 15,
               ),
+              // getbuilder
               GetBuilder<MyController>(
-                builder: (controller) {
+                builder: (data) {
                   return Center(
                     child: SizedBox(
                       height: 200,
                       width: 200,
-                      child: mycontroller.imagePick.value == ''
+                      child: data.imagePick.value == ''
                           ? const Text('Pls Select image')
-                          : Image.file(File(mycontroller.imagePick.value)),
+                          : Image.file(File(data.imagePick.value)),
                     ),
                   );
                 },
@@ -138,19 +192,26 @@ class EditPage extends StatelessWidget {
                   style:
                       ElevatedButton.styleFrom(backgroundColor: Colors.green),
                   onPressed: () {
-                    StudentModel val = StudentModel(
-                      id: data.id,
-                      name: _name.text,
-                      age: int.parse(_age.text),
-                      place: _place.text,
-                      std: int.parse(_std.text),
-                      image: mycontroller.imagePick.value,
-                    );
-                    mycontroller.addData(val);
-                    mycontroller.imagePick.value = '';
-                    Get.back();
+                    if (mycontroller.imagePick.value == '') {
+                      errorSnackBar(context, 'pls add image');
+                      _formkey.currentState!.validate();
+                      return;
+                    }
+                    if (_formkey.currentState!.validate()) {
+                      StudentModel val = StudentModel(
+                        id: data.id,
+                        name: _name.text,
+                        age: int.parse(_age.text),
+                        place: _place.text,
+                        std: int.parse(_std.text),
+                        image: mycontroller.imagePick.value,
+                      );
+                      mycontroller.addData(val);
+                      Get.back();
+                      successSnackBar(context, 'Data update successfully');
+                    }
                   },
-                  child: const Text('select image')),
+                  child: const Text('SUBMIT')),
             ],
           ),
         ),
